@@ -25,6 +25,7 @@ class RubePost
       login_form.field_with('username').value = username.sub(/@.*/,'')
       login_form.field_with('password').value = password
       @inbox = login_form.submit
+      @account = messages_form.action.match(/(\d{10,})/)[1]
       @agent
     end
 
@@ -33,27 +34,37 @@ class RubePost
       mails = doc.css('#messageList > tr')[1..-1] || raise('could not open inbox <-> login failed ?')
       mails.map do |mail|
         {
-          :id => mail.attr('id'),
+          :id => mail.attr('id').split('/').last,
           :sender => self.class.extract_sender(mail),
           :subject => mail.css('td.subject').text.strip
         }
-      end      
+      end
     end
 
     def email_content(id)
-      body = @agent.get("#{SHOW_URL}#{id.gsub('/','%2F')}").send(:html_body)
+      body = @agent.get("#{SHOW_URL}#{full_id(id).gsub('/','%2F')}").send(:html_body)
       Nokogiri::HTML(body).css('#e-post-body').first.text.strip
     end
 
     def move_to_trash(id)
-      form = @inbox.forms.detect{|f| f.name == 'messages' }
-      checkbox = form.checkboxes.detect{|c| c.value == id }
+      form = messages_form
+      checkbox = form.checkboxes.detect{|c| c.value == full_id(id) }
       checkbox.check
       button = form.buttons.detect{|b| b.name == 'cmd[delete-message]'}
-      @agent.submit(form, button)
+      page = @agent.submit(form, button)
+      checkbox.uncheck # revert checking or something might o wrong later...
+      page
     end
 
     private
+
+    def full_id(id)
+      "/#{@account}/INBOX/#{id}"
+    end
+
+    def messages_form
+      @inbox.forms.detect{|f| f.name == 'messages' }
+    end
 
     def self.extract_sender(mail)
       name, email = mail.css('td.sender a').text.strip.match(/(.*)\s+<(.*)>/)[1..-1]

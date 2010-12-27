@@ -12,7 +12,7 @@ describe RubePost do
 
     it "can fetch mail" do
       @emails.size.should >= 0
-      @emails.first.id.should =~ %r{^/\d+/INBOX/\d+$}
+      @emails.first.id.should =~ %r{^\d+$}
       @emails.first.subject.to_s .should_not == ''
       @emails.first.sender.should include('@')
     end
