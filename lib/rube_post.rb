@@ -12,6 +12,23 @@ class RubePost
     @grabber.emails_in_inbox.map{|d| Email.new(d, @grabber) }
   end
 
+  def move_to_gmail(username, password)
+    require 'gmail'
+    my_email = (username.include?('@') ? username : "#{username}@gmail.com")
+    Gmail.connect(username, password) do |gmail|
+      emails_in_inbox.each do |email|
+        gmail.deliver do
+          to my_email
+          subject email.subject
+          text_part do
+            body "#{email.sender}:\nepost-id:#{email.id}\n\n#{email.content}"
+          end
+        end
+        email.move_to_trash
+      end
+    end
+  end
+
   private
 
   class Grabber

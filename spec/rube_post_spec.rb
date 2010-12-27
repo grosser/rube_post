@@ -10,6 +10,7 @@ describe RubePost do
       @emails = RubePost.new(CFG['username'], CFG['password']).emails_in_inbox
     end
 
+    # if you do not have mails, ask a question to support -> you get a mail
     it "can fetch mail" do
       @emails.size.should >= 0
       @emails.first.id.should =~ %r{^\d+$}

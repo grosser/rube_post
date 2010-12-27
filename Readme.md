@@ -4,7 +4,7 @@ Install
 =======
     sudo gem install rube_post
 
- - Set your account to list-view/
+!! Set your account to list-view !!
 
 Usage
 =====
@@ -18,6 +18,10 @@ Usage
     puts mail.id
 
     mail.move_to_trash
+
+Move all mails to gmail.
+    gem install gmail
+    RubePost.new(username, password).move_to_gmail(gmail_username, gmail_password)
 
 TODO
 =====
