@@ -1,4 +1,4 @@
-Receive and send(todo) emails with epost.de (rub-e-post)
+Receive and send(todo) emails with epost.de (pronounced rub-e-post)
 
 Install
 =======
@@ -8,17 +8,21 @@ Install
 
 Usage
 =====
-    emails = RubePost.new(username, password).emails_in_inbox
-    first = emails.first
-    puts first.sender
-    puts first.content # will make an additional request
-    puts first.subject
-    puts first.id
+    client = RubePost.new(username, password)
+    emails = client.emails_in_inbox
+
+    mail = emails.first
+    puts mail.sender
+    puts mail.content # triggers new request
+    puts mail.subject
+    puts mail.id
+
+    mail.move_to_trash
 
 TODO
 =====
+ - work for more than first page of inbox
  - send mails ? <-> let user enter tan or receive tan via some service
- - move_to_trash / delete mails
 
 
 Author
